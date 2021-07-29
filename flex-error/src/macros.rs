@@ -374,7 +374,7 @@ macro_rules! define_error {
   ) => {
     $crate::define_error_with_tracer![
       @tracer( $crate::DefaultTracer ),
-      @attr[ derive(Debug) ],
+      @attr[ ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
@@ -408,7 +408,7 @@ macro_rules! define_error {
   ) => {
     $crate::define_error_with_tracer![
       @tracer( $tracer ),
-      @attr[ derive(Debug) ],
+      @attr[ ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
@@ -480,8 +480,9 @@ macro_rules! define_main_error {
         type Source = Self;
         type Detail = [< $name Detail >];
 
+        #[trusted]
         fn error_details($name(detail, trace): Self) -> ([< $name Detail >], Option<$tracer>) {
-            (detail, Some(trace))
+            todo!() // (detail, Some(trace))
         }
       }
 
@@ -489,8 +490,10 @@ macro_rules! define_main_error {
       where
           $tracer: ::core::fmt::Debug,
       {
+        #[trusted]
           fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-              ::core::fmt::Debug::fmt(self.trace(), f)
+            todo!()
+              // ::core::fmt::Debug::fmt(self.trace(), f)
           }
       }
 
@@ -498,10 +501,12 @@ macro_rules! define_main_error {
       where
           $tracer: ::core::fmt::Display,
       {
+        #[trusted]
           fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>)
             -> ::core::fmt::Result
           {
-              ::core::fmt::Display::fmt(self.trace(), f)
+            todo!()
+              // ::core::fmt::Display::fmt(self.trace(), f)
           }
       }
 
@@ -511,41 +516,49 @@ macro_rules! define_main_error {
       );
 
       impl $name {
-        pub fn detail(&self) -> &[< $name Detail >] {
-            &self.0
+        #[trusted]
+        pub fn detail(&self) {
+            todo!()
+            // &self.0
         }
 
-        pub fn trace(&self) -> &$tracer {
-            &self.1
+        #[trusted]
+        pub fn trace(&self) {
+            todo!()
+            // &self.1
         }
 
+        #[trusted]
         pub fn add_trace<E: ::core::fmt::Display>(self, message: &E) -> Self
         where
             $tracer: $crate::ErrorMessageTracer,
         {
-            let detail = self.0;
-            let trace = $crate::ErrorMessageTracer::add_message(self.1, message);
-            $name(detail, trace)
+            todo!()
+            // let detail = self.0;
+            // let trace = $crate::ErrorMessageTracer::add_message(self.1, message);
+            // $name(detail, trace)
         }
 
+        #[trusted]
         pub fn trace_from<E, Cont>(source: E::Source, cont: Cont) -> Self
         where
             E: $crate::ErrorSource<$tracer>,
             $tracer: $crate::ErrorMessageTracer,
             Cont: FnOnce(E::Detail) -> [< $name Detail >],
         {
-            let (detail1, m_trace1) = E::error_details(source);
-            let detail2 = cont(detail1);
-            match m_trace1 {
-                Some(trace1) => {
-                    let trace2 = $crate::ErrorMessageTracer::add_message(trace1, &detail2);
-                    $name(detail2, trace2)
-                }
-                None => {
-                    let trace2 = $crate::ErrorMessageTracer::new_message(&detail2);
-                    $name(detail2, trace2)
-                }
-            }
+          todo!()
+            // let (detail1, m_trace1) = E::error_details(source);
+            // let detail2 = cont(detail1);
+            // match m_trace1 {
+            //     Some(trace1) => {
+            //         let trace2 = $crate::ErrorMessageTracer::add_message(trace1, &detail2);
+            //         $name(detail2, trace2)
+            //     }
+            //     None => {
+            //         let trace2 = $crate::ErrorMessageTracer::new_message(&detail2);
+            //         $name(detail2, trace2)
+            //     }
+            // }
         }
       }
     ];
@@ -567,8 +580,9 @@ macro_rules! define_std_err_impl {
           $tracer: ::core::fmt::Debug + ::core::fmt::Display,
           $tracer: $crate::ErrorMessageTracer,
       {
+        #[trusted]
           fn source(&self) -> ::core::option::Option<&(dyn ::std::error::Error + 'static)> {
-              $crate::ErrorMessageTracer::as_error(self.trace())
+              todo!()// $crate::ErrorMessageTracer::as_error(self.trace())
           }
       }
     ];
@@ -676,16 +690,19 @@ macro_rules! define_error_detail_display {
   ) => {
     $crate::macros::paste! [
       impl ::core::fmt::Display for [< $name Detail >] {
+        #[trusted]
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>)
           -> ::core::fmt::Result
         {
-          match self {
-            $(
-              Self::$suberror( suberror ) => {
-                ::core::write!( f, "{}",  suberror )
-              }
-            ),*
-          }
+        //   match self {
+        //     $(
+        //       Self::$suberror( suberror ) => {
+        //         ::core::write!( f, "{}",  suberror )
+        //       }
+        //     ),*
+        //   }
+        // }
+          todo!()
         }
       }
     ];
@@ -725,10 +742,11 @@ macro_rules! define_suberrors {
       }
 
       impl ::core::fmt::Display for [< $suberror Subdetail >] {
+        #[trusted]
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
           use ::core::format_args;
           let $formatter_arg = self;
-          ::core::write!(f, "{}",  $formatter)
+          todo!() //::core::write!(f, "{}",  $formatter)
         }
       }
 
@@ -802,16 +820,18 @@ macro_rules! define_error_constructor {
     @args( $( $arg_name:ident: $arg_type:ty ),* ) $(,)?
   ) => {
     $crate::macros::paste! [
+      #[trusted]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
       ) -> $name
       {
-        let detail = [< $name Detail >]::$suberror([< $suberror Subdetail >] {
-          $( $arg_name, )*
-        });
+        // let detail = [< $name Detail >]::$suberror([< $suberror Subdetail >] {
+        //   $( $arg_name, )*
+        // });
 
-        let trace = < $tracer as $crate::ErrorMessageTracer >::new_message(&detail);
-        $name(detail, trace)
+        // let trace = < $tracer as $crate::ErrorMessageTracer >::new_message(&detail);
+        // $name(detail, trace)
+        todo!()
       }
     ];
   };
@@ -822,19 +842,21 @@ macro_rules! define_error_constructor {
     @source[ Self ]
   ) => {
     $crate::macros::paste! [
+      #[trusted]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
         source: $name
       ) -> $name
       {
-        let detail = [< $name Detail >]::$suberror([< $suberror Subdetail >] {
-          $( $arg_name, )*
-          source: Box::new(source.0),
-        });
+        // let detail = [< $name Detail >]::$suberror([< $suberror Subdetail >] {
+        //   $( $arg_name, )*
+        //   source: Box::new(source.0),
+        // });
 
-        let trace = source.1.add_message(&detail);
+        // let trace = source.1.add_message(&detail);
 
-        $name(detail, trace)
+        // $name(detail, trace)
+        todo!()
       }
     ];
   };
@@ -845,18 +867,20 @@ macro_rules! define_error_constructor {
     @source[ $source:ty ]
   ) => {
     $crate::macros::paste! [
+      #[trusted]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
         source: $crate::AsErrorSource< $source, $tracer >
       ) -> $name
       {
-        $name::trace_from::<$source, _>(source,
-          | source_detail | {
-            [< $name Detail >]::$suberror([< $suberror Subdetail >] {
-              $( $arg_name, )*
-              source: source_detail,
-            })
-          })
+        // $name::trace_from::<$source, _>(source,
+        //   | source_detail | {
+        //     [< $name Detail >]::$suberror([< $suberror Subdetail >] {
+        //       $( $arg_name, )*
+        //       source: source_detail,
+        //     })
+        //   })
+        todo!()
       }
     ];
   };

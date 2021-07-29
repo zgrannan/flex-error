@@ -12,6 +12,7 @@ readme = "../README.md"
 paste = "1.0.5"
 eyre = { version = "0.6.5", optional = true }
 anyhow = { version = "1.0.40", optional = true }
+# prusti-contracts = { path = "../../prusti-dev/prusti-contracts" }
 
 [features]
 default = ["full"]
