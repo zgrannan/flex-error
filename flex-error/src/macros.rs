@@ -373,7 +373,7 @@ macro_rules! define_error {
   ) => {
     $crate::define_error_with_tracer![
       @tracer( $crate::DefaultTracer ),
-      @attr[ ],
+      @attr[ derive(Debug) ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
@@ -407,7 +407,7 @@ macro_rules! define_error {
   ) => {
     $crate::define_error_with_tracer![
       @tracer( $tracer ),
-      @attr[ ],
+      @attr[ derive(Debug) ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
