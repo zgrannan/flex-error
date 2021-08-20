@@ -480,7 +480,7 @@ macro_rules! define_main_error {
         type Source = Self;
         type Detail = [< $name Detail >];
 
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         fn error_details($name(detail, trace): Self) -> ([< $name Detail >], Option<$tracer>) {
             todo!() // (detail, Some(trace))
         }
@@ -490,7 +490,7 @@ macro_rules! define_main_error {
       where
           $tracer: ::core::fmt::Debug,
       {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
           fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
             todo!()
               // ::core::fmt::Debug::fmt(self.trace(), f)
@@ -501,7 +501,7 @@ macro_rules! define_main_error {
       where
           $tracer: ::core::fmt::Display,
       {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
           fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>)
             -> ::core::fmt::Result
           {
@@ -516,19 +516,19 @@ macro_rules! define_main_error {
       );
 
       impl $name {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         pub fn detail(&self) {
             todo!()
             // &self.0
         }
 
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         pub fn trace(&self) {
             todo!()
             // &self.1
         }
 
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         pub fn add_trace<E: ::core::fmt::Display>(self, message: &E) -> Self
         where
             $tracer: $crate::ErrorMessageTracer,
@@ -539,7 +539,7 @@ macro_rules! define_main_error {
             // $name(detail, trace)
         }
 
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         pub fn trace_from<E, Cont>(source: E::Source, cont: Cont) -> Self
         where
             E: $crate::ErrorSource<$tracer>,
@@ -580,7 +580,7 @@ macro_rules! define_std_err_impl {
           $tracer: ::core::fmt::Debug + ::core::fmt::Display,
           $tracer: $crate::ErrorMessageTracer,
       {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
           fn source(&self) -> ::core::option::Option<&(dyn ::std::error::Error + 'static)> {
               todo!()// $crate::ErrorMessageTracer::as_error(self.trace())
           }
@@ -690,7 +690,7 @@ macro_rules! define_error_detail_display {
   ) => {
     $crate::macros::paste! [
       impl ::core::fmt::Display for [< $name Detail >] {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>)
           -> ::core::fmt::Result
         {
@@ -742,7 +742,7 @@ macro_rules! define_suberrors {
       }
 
       impl ::core::fmt::Display for [< $suberror Subdetail >] {
-        #[trusted]
+        #[cfg_attr(feature="prusti", trusted)]
         fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
           use ::core::format_args;
           let $formatter_arg = self;
@@ -820,7 +820,7 @@ macro_rules! define_error_constructor {
     @args( $( $arg_name:ident: $arg_type:ty ),* ) $(,)?
   ) => {
     $crate::macros::paste! [
-      #[trusted]
+      #[cfg_attr(feature="prusti", trusted)]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
       ) -> $name
@@ -842,7 +842,7 @@ macro_rules! define_error_constructor {
     @source[ Self ]
   ) => {
     $crate::macros::paste! [
-      #[trusted]
+      #[cfg_attr(feature="prusti", trusted)]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
         source: $name
@@ -867,7 +867,7 @@ macro_rules! define_error_constructor {
     @source[ $source:ty ]
   ) => {
     $crate::macros::paste! [
-      #[trusted]
+      #[cfg_attr(feature="prusti", trusted)]
       pub fn [< $suberror:snake >](
         $( $arg_name: $arg_type, )*
         source: $crate::AsErrorSource< $source, $tracer >
