@@ -371,9 +371,17 @@ macro_rules! define_error {
   ( $name:ident
     { $($suberrors:tt)* }
   ) => {
+    #[cfg(not(feature="prusti"))]
     $crate::define_error_with_tracer![
       @tracer( $crate::DefaultTracer ),
       @attr[ derive(Debug) ],
+      @name( $name ),
+      @suberrors{ $($suberrors)* }
+    ];
+    #[cfg(feature="prusti")]
+    $crate::define_error_with_tracer![
+      @tracer( $crate::DefaultTracer ),
+      @attr[ derive(PrustiDebug) ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
@@ -405,9 +413,17 @@ macro_rules! define_error {
     $name:ident,
     { $($suberrors:tt)* }
   ) => {
+    #[cfg(not(feature="prusti"))]
     $crate::define_error_with_tracer![
       @tracer( $tracer ),
       @attr[ derive(Debug) ],
+      @name( $name ),
+      @suberrors{ $($suberrors)* }
+    ];
+    #[cfg(feature="prusti")]
+    $crate::define_error_with_tracer![
+      @tracer( $tracer ),
+      @attr[ derive(PrustiDebug) ],
       @name( $name ),
       @suberrors{ $($suberrors)* }
     ];
